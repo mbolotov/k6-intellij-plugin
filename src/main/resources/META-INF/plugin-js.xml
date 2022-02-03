@@ -1,0 +1,5 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <runLineMarkerContributor id="k6RunLineMarkerContributor" language="JavaScript" implementationClass="io.k6.ide.plugin.run.K6RunLineMarkerProvider"/>
+    </extensions>
+</idea-plugin>

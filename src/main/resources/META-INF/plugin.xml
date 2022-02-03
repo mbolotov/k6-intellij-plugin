@@ -1,0 +1,41 @@
+<idea-plugin>
+    <id>io.k6.ide.plugin</id>
+    <name>k6</name>
+    <vendor>k6</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="plugin-js.xml">JavaScript</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="io.k6.ide.plugin.settings.K6Settings"/>
+        <applicationConfigurable groupId="tools" displayName="k6" id="preferences.K6" instance="io.k6.ide.plugin.settings.K6SettingsConfigurable"/>
+
+        <configurationType implementation="io.k6.ide.plugin.run.K6RunConfigurationType"/>
+        <runConfigurationProducer implementation="io.k6.ide.plugin.run.K6Producer"/>
+
+    </extensions>
+
+    <applicationListeners>
+        <listener class="io.k6.ide.plugin.K6ProjectListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
+    <actions>
+        <action id="io.k6.ide.plugin.run"
+                text="k6: run current file"
+                description="Run k6 Script"
+                class="io.k6.ide.plugin.actions.RunK6Action"
+                icon="/icons/k6_16x16.png">
+            <keyboard-shortcut first-keystroke="alt K" keymap="$default"/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="io.k6.ide.plugin.run.cloud"
+                text="k6: run current file in k6 cloud"
+                description="Run k6 Script in Cloud"
+                class="io.k6.ide.plugin.actions.RunK6CloudAction"
+                icon="/icons/k6_16x16.png">
+            <keyboard-shortcut first-keystroke="alt shift K" keymap="$default"/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+
+    </actions>
+</idea-plugin>

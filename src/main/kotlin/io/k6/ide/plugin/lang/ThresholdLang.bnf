@@ -1,0 +1,43 @@
+{
+  parserClass="io.k6.ide.plugin.lang.ThresholdParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Threshold"
+  psiImplClassSuffix="Impl"
+  psiPackage="io.k6.ide.plugin.lang.psi"
+  psiImplPackage="io.k6.ide.plugin.lang.psi.impl"
+
+  elementTypeHolderClass="io.k6.ide.plugin.lang.ThresholdTypes"
+  elementTypeClass="io.k6.ide.plugin.lang.ThresholdElementType"
+  tokenTypeClass="io.k6.ide.plugin.lang.ThresholdTokenType"
+
+  tokens = [
+    fixedNumber='regexp:-?[0-9]+(\.[_0-9]*)?'
+    EQ='='
+    LESS='<'
+    LESSEQ='<='
+    MORE='>'
+    MOREEQ='>='
+    LPAREN='('
+    RPAREN=')'
+    COUNT='count'
+    RATE='rate'
+    VALUE='value'
+    AVG='avg'
+    MIN='min'
+    MAX='max'
+    MED='med'
+    PERCENTILE='p'
+  ]
+}
+
+ThresholdExpression ::= Primary
+
+Primary ::= Aggregation_method Operator fixedNumber
+Operator ::= EQ | LESS | MORE | LESSEQ | MOREEQ  { name="one of '>', '<', '=', '<=', '>='" }
+
+Aggregation_method ::= COUNT | RATE | VALUE | AVG | MIN | MAX | MED | Percentile_Call { name="one of 'count', 'rate', 'value', 'avg','min','max','med', 'p()'" }
+
+Percentile_Call ::= PERCENTILE LPAREN fixedNumber RPAREN
+
