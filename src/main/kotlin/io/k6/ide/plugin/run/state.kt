@@ -46,7 +46,7 @@ class K6ConsoleProperties(val config: K6RunConfig, executor: Executor): SMTRunne
 
     override fun getTestLocator() = SMTestLocator { protocol, path, project, scope ->
         if (protocol != "k6") return@SMTestLocator emptyList()
-        val script = config.data.script?.toVFile() ?: return@SMTestLocator emptyList()
+        val script = config.data.getScriptPath(project)?.absolutePath?.toVFile() ?: return@SMTestLocator emptyList()
         val psiFile = PsiManager.getInstance(project).findFile(script) ?: return@SMTestLocator emptyList()
         val element = psiFile.findElementAt(psiFile.text.indexOf(path)) ?: return@SMTestLocator emptyList()
         return@SMTestLocator listOf(PsiLocation(element))
@@ -62,8 +62,9 @@ class K6RunState(val myEnv: ExecutionEnvironment, val myRunConfiguration: K6RunC
         val myConsoleProperties = K6ConsoleProperties(myRunConfiguration, myEnv.executor)
         val createConsole = SMTestRunnerConnectionUtil.createConsole( myConsoleProperties.testFrameworkName, myConsoleProperties)
         val data = myRunConfiguration.data
+        val script = data.getScriptPath(myEnv.project) ?: error("Incorrect script path: ${data.script}")
         val generalCommandLine = GeneralCommandLine("k6", if (data.type == RunType.local) "run" else "cloud",
-            if (data.thresholdsAsTests) wrapScript(data.script ?: error("undefined script path")) else data.script,
+            if (data.thresholdsAsTests) wrapScript(script.absolutePath) else script.absolutePath,
             *translateCommandline(data.additionalParams ?: "")
         )
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
@@ -83,8 +84,8 @@ class K6RunState(val myEnv: ExecutionEnvironment, val myRunConfiguration: K6RunC
         val processHandler = KillableColoredProcessHandler(commandLine)
         createConsole.attachToProcess(processHandler)
         processHandler.setHasPty(true)
-        val testName = File(data.script!!).name
-        val location = LocalFileSystem.getInstance().findFileByPath(data.script!!)?.url
+        val testName = script.name
+        val location = LocalFileSystem.getInstance().findFileByIoFile(script)?.url
         val smTestProxy = (createConsole as SMTRunnerConsoleView).resultsViewer.root as SMTestProxy.SMRootTestProxy
         smTestProxy.setTestsReporterAttached()
         smTestProxy.setSuiteStarted()

@@ -24,9 +24,9 @@ class K6Producer : LazyRunConfigurationProducer<K6RunConfig>() {
         ConfigurationTypeUtil.findConfigurationType(K6RunConfigurationType::class.java).configurationFactories[0]
 
     override fun isConfigurationFromContext(configuration: K6RunConfig, context: ConfigurationContext): Boolean {
-        val script = configuration.data.script ?: return false
+        val script = configuration.data.getScriptPath(context.project) ?: return false
         val file = context.location?.virtualFile ?: return false
-        return file == LocalFileSystem.getInstance().findFileByPath(script)
+        return file == LocalFileSystem.getInstance().findFileByIoFile(script)
     }
 
     override fun setupConfigurationFromContext(
@@ -38,7 +38,7 @@ class K6Producer : LazyRunConfigurationProducer<K6RunConfig>() {
         if (!file.isK6Supported()) {
             return false
         }
-        configuration.data.script = file.path
+        configuration.data.script = getRelativePath(context.project, file.path)
         configuration.setGeneratedName()
         return true
     }

@@ -8,7 +8,7 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.xmlb.XmlSerializer
@@ -91,11 +91,12 @@ class K6RunConfig(project: Project, factory: ConfigurationFactory) :
     }
 
     override fun checkConfiguration() {
-        if (!File(data.script ?: "").isFile) {
-            throw RuntimeConfigurationError("Script file does not exist: ${data.script}")
+        val scriptPath = data.getScriptPath(project)
+        if (scriptPath?.isFile != true) {
+            throw RuntimeConfigurationError("Script file does not exist: ${scriptPath}")
         }
         if (data.type == RunType.cloud) {
-            if (K6Settings.instance.cloudToken.takeIf { it.isNotBlank() } ?: System.getenv(TOKEN_ENV_NAME) == null) {
+            if ((K6Settings.instance.cloudToken.takeIf { it.isNotBlank() } ?: System.getenv(TOKEN_ENV_NAME)) == null) {
                 throw RuntimeConfigurationError(
                     "The cloud execution mode requires you to either have a cloud token added in your environment variables or in the k6 plugin settings",
                     Runnable {
@@ -107,10 +108,10 @@ class K6RunConfig(project: Project, factory: ConfigurationFactory) :
     }
 }
 
-private fun getRelativePath(project: Project, path: String): String {
+fun getRelativePath(project: Project, path: String): String {
     val file = LocalFileFinder.findFile(path)
     if (file != null && file.isValid) {
-        val root = ProjectFileIndex.getInstance(project).getContentRootForFile(file)
+        val root = project.guessProjectDir()
         if (root != null && root.isValid) {
             val relativePath = VfsUtilCore.getRelativePath(file, root, File.separatorChar)
             relativePath?.let { return relativePath }
@@ -138,6 +139,12 @@ class K6RunData : Cloneable {
     var pty = true
 
     var thresholdsAsTests = true
+
+    fun getScriptPath(project: Project) : File? {
+        val script = script ?: return null
+        File(script).takeIf { it.isAbsolute }?.let { return it }
+        return File((project.guessProjectDir() ?: return null).toNioPath().toFile(), script)
+    }
 
     public override fun clone(): K6RunData {
         try {
