@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.k6.ide.plugin</id>
     <name>k6</name>
-    <vendor>k6</vendor>
+    <vendor>mbolotov</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="plugin-js.xml">JavaScript</depends>

@@ -2,9 +2,13 @@
 
 # k6 IntelliJ Plugin Changelog
 
+## [0.3.0]
+### Added
+- Support relative script path (issue #3)
+
 ## [0.2.3]
 ### Added
-- 2021.3 Platform version supported (issue #10)
+- 2021.3 Platform version supported 
 
 ## [0.2.2]
 ### Added
@@ -12,7 +16,7 @@
 
 ## [0.2.1]
 ### Fixed
-- Unable to start a run configuration on Mac OS (issue #5)
+- Unable to start a run configuration on Mac OS 
 
 ## [0.2.0]
 ### Added
