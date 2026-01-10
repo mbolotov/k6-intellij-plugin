@@ -60,13 +60,6 @@ For running cloud tests, set your [k6 Cloud Token](https://app.k6.io/account/tok
 ![k6 Cloud Token](doc/intellij-k6-plugin-cloud-token.png)
                                                 
 
-## Run a test written in TypeScript 
-
-k6 does not support running a typescript test directly. To execute both build task and run test actions **in one click** you can define a `Run configuration` 
-to run your *compiled js test* and to execute a npm build script before launch:
-
-![img.png](doc/typescript-before.png)
-
 ## Show thresholds as tests
 When `Show thresholds as tests` checkbox is selected in a run configuration, the plugin will display each configured threshold as a passed or failed test inside the test console tree view:
 
